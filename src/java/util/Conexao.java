@@ -10,28 +10,38 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+/**
+ *
+ * @author Egerton Maciel
+ */
+
 public class Conexao {
 
     private static final String URL_CONEXAO = "jdbc:mysql://localhost/crud_fichas";
     private static final String USUARIO = "root";
     private static final String SENHA = "55555";
 
-    public static ResultSet update(String sql) {
+    public static ArrayList<Integer> update(String sql) {
         return update(sql, null);
     }
 
-    public static ResultSet update(String sql, ArrayList<Object> parametros) {
-        ResultSet resultado = null;
+    public static ArrayList<Integer> update(String sql, ArrayList<Object> parametros) {
+        ArrayList<Integer> resultado = new ArrayList<>();
         Connection con;
         PreparedStatement ps;
+        ResultSet rs;
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = (Connection) DriverManager.getConnection(URL_CONEXAO, USUARIO, SENHA);
             ps = (PreparedStatement) con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps = setParametros(ps, parametros);
             ps.execute();
-            resultado = ps.getGeneratedKeys();
+            rs = ps.getGeneratedKeys();
+            while (rs.next()) {
+                resultado.add(rs.getInt(1));
+            }
             ps.close();
+            rs.close();
             con.close();
         } catch (Exception e) {
         }
@@ -55,7 +65,6 @@ public class Conexao {
             ps = setParametros(ps, parametros);
             rs = ps.executeQuery();
             while (rs.next()) {
-//                rs.getString(rs.getMetaData().getColumnCount());
                 arraySecundario = new ArrayList<>();
                 for (int y = 1; y <= rs.getMetaData().getColumnCount(); y++) {
                     arraySecundario.add(rs.getString(y));

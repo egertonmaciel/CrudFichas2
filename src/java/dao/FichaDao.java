@@ -63,12 +63,9 @@ public class FichaDao {
         ArrayList<Object> parametros = new ArrayList<>();
         parametros.add(ficha.getStatus() == true ? 1 : 0);
         parametros.add(ficha.getObservacao());
-        ResultSet rs = Conexao.update(sql, parametros);
-        try {
-            while (rs.next()) {
-                ficha.setId(rs.getInt(0));
-            }
-        } catch (Exception e) {
+        ArrayList<Integer> id = Conexao.update(sql, parametros);
+        for (Integer i : id) {
+            ficha.setId(i);
         }
         AnimalDao.setAnimaisPorFicha(ficha);
     }
